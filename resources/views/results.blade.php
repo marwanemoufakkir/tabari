@@ -117,18 +117,12 @@
 										<!--begin::Input group-->
 										<div class="mb-5">
 											<label class="fs-6 form-label fw-bolder text-dark">سورة  Surah</label>
-										   
-											<div class="scroll h-200px pt-2">
+											<select name="filter[surah][]" class="form-select form-select-solid" data-control="select2" data-close-on-select="false" data-placeholder="سورة  Surah" data-allow-clear="true" multiple="multiple">
+												<option></option>
 												@foreach (\App\Models\Surah::get() as $surah)
-											<!--begin::Checkbox-->
-											<div class="form-check form-check-custom form-check-solid mb-5">
-												<input class="form-check-input" type="checkbox" value="{{ $surah->id}}"  name="filter[surah][]" />
-												<label class="form-check-label flex-grow-1 fw-bold text-gray-700 fs-6" for="type">{!! str_replace('سورة', ' ', $surah->title) !!} - {{ $surah->transliteration }}</label>
-											</div>
-											<!--end::Checkbox-->
-											@endforeach
-											</div>
-											
+												<option value="{{ $surah->id}}">{!! str_replace('سورة', ' ', $surah->title) !!} - {{ $surah->transliteration }}</option>
+												@endforeach
+											</select>
 										</div>
 										<!--end::Input group-->
 
@@ -136,36 +130,29 @@
 										<div class="mb-5">
 											<label class="fs-6 form-label fw-bolder text-dark">موضوع Topic</label>
 											
-										   
-											<div class="scroll h-200px pt-2">
-											@foreach (\App\Models\Topic::groupBy('name')->get()->toArray() as $topic)
-											@if(!empty($topic['name']))
-											<!--begin::Checkbox-->
-											<div class="form-check form-check-custom form-check-solid mb-5">
-												<input class="form-check-input" type="checkbox" value="{{ $topic['name']}}"  name="filter[topic][]" />
-												<label class="form-check-label flex-grow-1 fw-bold text-gray-700 fs-6" for="type">{{$topic['name']}} </label>
-											</div>
-											@endif
-											<!--end::Checkbox-->
-											@endforeach
-											</div>
+											<select name="filter[topic][]" class="form-select form-select-solid" data-control="select2" data-close-on-select="false" data-placeholder="موضوع Topic" data-allow-clear="true" multiple="multiple">
+												<option></option>
+												@foreach (\App\Models\Topic::groupBy('name')->get()->toArray() as $topic)
+												@if(!empty($topic['name']))
+												<option value="{{$topic['name']}}">{{$topic['name']}}</option>
+												@endif
+												@endforeach
+											</select>
+
 											
 										</div>
 										<!--begin::Input group-->
 										<div class="mb-5">
 											<label class="fs-6 form-label fw-bolder text-dark">موضوع فرعي Subtopic</label>
-											<div class="scroll h-200px pt-2">
-											@foreach (\App\Models\Subtopic::groupBy('name')->get()->toArray() as $subtopic)
-											@if(!empty($subtopic['name']))
-											<!--begin::Checkbox-->
-											<div class="form-check form-check-custom form-check-solid mb-5">
-												<input class="form-check-input" type="checkbox" value="{{ $subtopic['name']}}"  name="filter[subtopic][]" />
-												<label class="form-check-label flex-grow-1 fw-bold text-gray-700 fs-6" for="type">{{$subtopic['name']}} </label>
-											</div>
-											@endif
-											<!--end::Checkbox-->
-											@endforeach
-											</div>
+											<select name="filter[subtopic][]" class="form-select form-select-solid" data-control="select2" data-close-on-select="false" data-placeholder="موضوع فرعي Subtopic" data-allow-clear="true" multiple="multiple">
+												<option></option>
+												@foreach (\App\Models\Subtopic::groupBy('name')->get()->toArray() as $topic)
+												@if(!empty($subtopic['name']))
+												<option value="{{$subtopic['name']}}">{{$subtopic['name']}}</option>
+												@endif
+												@endforeach
+											</select>
+
 											
 										</div>
 										<!--end::Input group-->
@@ -190,7 +177,7 @@
 										<!--begin::Action-->
 										<div class="d-flex align-items-left justify-content-start">
 											<button type="reset" class="btn btn-active-light-primary btn-color-gray-400 me-3">Discard</button>
-											<button type="submit" class="btn btn-primary">Filter</button>
+											<button type="submit" class="btn btn-warning fw-bolder btn-text-dark border-0 fs-6 h-40px">Filter</button>
 										</div>
 										<!--end::Action-->
 				
@@ -249,7 +236,7 @@
 										<span class="fs-1 fw-bolder text-gray-900 text-hover-primary me-1">﴿ {{$item['_source']['ayahTitle']}} ﴾</span>
 										<!--end::Title-->
 										@php $chapter=\App\Models\Surah::where('id',$item['_source']['chapter'])->first(); @endphp 				
-										@if ($chapter)<span class="fs-4 fw-bolder text-muted text-hover-primary me-1"> [ {{ $chapter['title'] }} -  {{ explode('.',$item['_source']['ayah'])[1] }} ]  @if($item['_source']['vol']) [Page {{$item['_source']['vol']}}]@endif											</span> @endif
+										@if ($chapter)<span class="fs-4 fw-bolder text-muted text-hover-primary me-1"> [ {{ $chapter['title'] }} -  {{ explode('.',$item['_source']['ayah'])[1] }} ]  </span> @endif @if($item['_source']['vol'])  <span class="fs-4 fw-bolder text-dark text-hover-primary me-1">  Page {{$item['_source']['vol']}} </span>@endif
 										
 									</div>
 									<!--end::Head-->
@@ -346,10 +333,29 @@
 
 			</div>
 			<!--end::Container-->
-				
+
 			</div>
 			<!--end::Page-->
-			
+			<div class="footer pt-10 pb-5 d-flex flex-column flex-md-row flex-stack" id="kt_footer" style="background-color: #757052;padding-left: 40px;padding-right: 40px;">
+				<!--begin::Copyright-->
+				<div class="text-dark order-2 order-md-1">
+					<span class="text-white fw-semibold me-1">2022©</span>
+				</div>
+				<!--end::Copyright-->
+				<!--begin::Menu-->
+				<ul class="menu fw-semibold order-1">
+					<li class="menu-item">
+						<a href="/topics?surah=&amp;chart=packedbubble"  class="text-white  px-2">Graph</a>
+					</li>
+					<li class="menu-item">
+						<a href="/search"  class="text-white  px-2">Search</a>
+					</li>
+					<li class="menu-item">
+						<a href="/about"  class="text-white  ps-2 pe-0">About</a>
+					</li>
+				</ul>
+				<!--end::Menu-->
+			</div>
 		</div>
 		<!--end::Root-->
 

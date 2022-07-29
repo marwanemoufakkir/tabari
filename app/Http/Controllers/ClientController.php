@@ -191,7 +191,7 @@ class ClientController extends Controller
         $searchParams = [
             'index' => 'my-tafsir',
             'from'=>0,
-            'size'=>1000,
+            'size'=>10,
             'body' => $search->toArray(),
         ];
         $searchParams['sort'] = array('timestamp:asc');
@@ -342,12 +342,12 @@ class ClientController extends Controller
         $searchParams = [
             'index' => 'my-tafsir',
             'from'=>0,
-            'size'=>10000,
+            'size'=>10,
             'body' => $search->toArray(),
         ];
         $searchParams['sort'] = array('timestamp:asc');
         $items = $this->elasticsearch->search($searchParams);
-        $indices = $this->elasticsearch->cat()->indices(array('index' =>'my-tafsir'));
+        // $indices = $this->elasticsearch->cat()->indices(array('index' =>'my-tafsir'));
         // dd($indices[0]);
          return $items;
     
