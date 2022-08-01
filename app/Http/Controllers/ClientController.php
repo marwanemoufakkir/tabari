@@ -68,141 +68,7 @@ class ClientController extends Controller
     }
 
 
-    private function searchOnElasticsearch(Request $request)
-    {
-        
-        $requestParams = $request->kt_docs_repeater_advanced;
-        
-        $search = new Search();
-        $boolQuery = new BoolQuery();
 
-        $query_string='';
-        foreach ($requestParams as $key => $param) {
-            
-            $test = new BoolQuery();
-            $test->addParameter("minimum_should_match", 1);
-            $test->addParameter("boost", 1);
-            $param=array_filter($param);
-
-            
-            $searchType=$param['search_type'];
-            if(isset($param['bool'])){
-                $boolOperator=$param['bool'];   
-            }else{
-                $boolOperator='MUST';
-
-            }
-            switch ($boolOperator) {
-                case 'MUST':
-                    $BoolQueryOperator='AND';
-                    break;
-                case 'SHOULD':
-                    $BoolQueryOperator='OR';
-                    break;
-                default:
-                $BoolQueryOperator='AND NOT';
-                    break;
-            }
-
-            $query_string.='(';
-            foreach ($param as $key => $field) {
-                if($key === 'content' ){
-                    switch ($searchType) {
-                        case 'default':
-                            $query_string.='AND content.rebuilt_arabic:'.$field;                            
-                            break;
-                        case 'exact':
-                            $query_string.="AND content.autocomplete_arabic:\"$field\"";
-
-                            // $query_string.='AND content.autocomplete_arabic:\"'.$field.'\"';
-                            break;
-                        case 'synonym':
-                            $query_string.='AND content.arabic_synonym_normalized:'.$field;
-                            break;
-                        default:
-                            $query_string.='AND content.boolean_sim_field:'.$field;
-                            break;
-                    }
-
-                }
-                elseif ($key === 'ayah' || $key === 'chapter' ||  $key === 'topic' || $key === 'subtopic' || $key === 'type') {
-                    $query_string.=' AND '.$key.':'.$field.' ';
-                    
-                }
-
-            }
-            $query_string.=') '.$BoolQueryOperator;
-            
-        }
-        // dd($this->cleanupQuery($query_string,$BoolQueryOperator));
-        $queryStringQuery=new QueryStringQuery($this->cleanupQuery($query_string,$BoolQueryOperator));
-        $boolQuery->add($queryStringQuery);
-        $search->addQuery($boolQuery, BoolQuery::FILTER);
-        $requestFilter = $request->filter;
-
-        if(isset($requestFilter)){
-            foreach ($requestFilter as $key => $value) {
-            
-                if( $key === 'surah'){
-                    foreach ($value as $key => $term) {
-                        $filter = new TermQuery('chapter',  $term);
-                        $search->addQuery($filter, BoolQuery::FILTER);
-                        
-                    }
-    
-                }
-                if( $key === 'type'){
-                    foreach ($value as $key => $term) {
-                        $filter = new TermQuery('type',  $term);
-                        $search->addQuery($filter, BoolQuery::FILTER);
-                        
-                    }
-    
-                }
-                if( $key === 'topic'){
-                    foreach ($value as $key => $term) {
-                        $filter = new TermQuery('topic',  $term);
-                        $search->addQuery($filter, BoolQuery::FILTER);
-                        
-                    }
-    
-                }
-                if( $key === 'subtopic'){
-                    foreach ($value as $key => $term) {
-                        $filter = new TermQuery('subtopic',  $term);
-                        $search->addQuery($filter, BoolQuery::FILTER);
-                        
-                    }
-    
-                }
-            }
-        }
-
-
-        $higlight = new Highlight();
-        $higlight->addField('content');
-        $higlight->addField('content.arabic_synonym_normalized');
-        $higlight->addField('content.rebuilt_arabic');
-        $higlight->addField('content.autocomplete_arabic');
-        $higlight->setTags(["<a class='ls-2 fw-bolder' style='text-decoration: underline;'>"],["</a>"]);
-        $higlight->setFragmentSize(0);
-        $higlight->setNumberOfFragments(2);
-        $search->addHighlight($higlight);
-        $searchParams = [
-            'index' => 'my-tafsir',
-            'from'=>0,
-            'size'=>10,
-            'body' => $search->toArray(),
-        ];
-        $searchParams['sort'] = array('timestamp:asc');
-
-        $items = $this->elasticsearch->search($searchParams);
-        
-         return $items;
-    
-        
-
-    }
     private function searchOnElasticsearchBool(Request $request)
     {
         
@@ -211,8 +77,7 @@ class ClientController extends Controller
         $requestParams = $request->kt_docs_repeater_advanced;
         $search = new Search();
         $boolQuery=new BoolQuery();
-        // $boolQuery->addParameter("minimum_should_match", 1);
-        // $boolQuery->addParameter("boost", 1);
+  
         
         foreach ($requestParams as $key => $param) {
 
@@ -336,8 +201,8 @@ class ClientController extends Controller
         $higlight->addField('content.boolean_sim_field');
 
         $higlight->setTags(["<a class='ls-2 fw-bolder' style='text-decoration: underline;'>"],["</a>"]);
-        $higlight->setFragmentSize(0);
-        $higlight->setNumberOfFragments(2);
+        // $higlight->setFragmentSize(0);
+        // $higlight->setNumberOfFragments(2);
         $search->addHighlight($higlight);
         $searchParams = [
             'index' => 'my-tafsir',

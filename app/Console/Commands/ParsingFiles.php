@@ -92,17 +92,17 @@ class ParsingFiles extends Command
                       "type"=>"stemmer",
                       "language"=>"arabic"
                     ],
-                    "quran_arabic_word_synonym"=>[
-                    "type"=> "synonym",
-                   "expand"=> "true",
-                   "lenient"=> "true",
-                   "synonyms_path"=> "analysis/quran_arabic_word_synonym.txt"
-                    ],
-                  "noun_synonym"=>[
-                   "type"=> "synonym",
-                    "expand"=>"true",
-                    "synonyms_path"=> "analysis/noun_synonym.txt"
-                  ],
+                  //   "quran_arabic_word_synonym"=>[
+                  //   "type"=> "synonym",
+                  //  "expand"=> "true",
+                  //  "lenient"=> "true",
+                  //  "synonyms_path"=> "analysis/quran_arabic_word_synonym.txt"
+                  //   ],
+                  // "noun_synonym"=>[
+                  //  "type"=> "synonym",
+                  //   "expand"=>"true",
+                  //   "synonyms_path"=> "analysis/noun_synonym.txt"
+                  // ],
                   "shingle_filter"=>[
                     "type"=> "shingle",
                    "min_shingle_size"=> 2,
@@ -138,8 +138,8 @@ class ParsingFiles extends Command
                         "arabic_normalization",
                         "arabic_stemmer",
                         "arabic_stop",
-                        "quran_arabic_word_synonym",
-                        "noun_synonym",
+                        // "quran_arabic_word_synonym",
+                        // "noun_synonym",
                         "icu_folding"
                       ]
                     ]
@@ -234,7 +234,7 @@ class ParsingFiles extends Command
     }
     protected function getText(){
         $doc = new \DOMDocument;
-        $files = glob("Tabari_komplett_komplett.xml");
+        $files = glob("surah0-114/*/*.xml");
         $sections = array();
         $csv=array();
         $listTopicsDB =array();

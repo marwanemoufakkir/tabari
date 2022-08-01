@@ -76,15 +76,17 @@
 									<!--begin::Menu-->
 									<div class="menu menu-lg-rounded menu-column menu-lg-row menu-state-bg menu-title-gray-700 menu-state-title-primary menu-state-icon-primary menu-state-bullet-primary menu-arrow-gray-400 fw-bold my-5 my-lg-0 align-items-stretch" id="#kt_header_menu" data-kt-menu="true">
 										<div class="menu-item me-lg-1">
+											<a class="menu-link py-3" href="{{'/'}}">
+												<span class="text-dark fw-bolder">Search</span>
+											</a>
+										</div>
+
+										<div class="menu-item me-lg-1">
 											<a class="menu-link   py-3" href="/topics?surah=&chart=packedbubble">
 												<span class="text-dark fw-bolder">Graph</span>
 											</a>
 										</div>
-                                        <div class="menu-item me-lg-1">
-											<a class="menu-link py-3" href="{{'/search'}}">
-												<span class="text-dark fw-bolder">Search</span>
-											</a>
-										</div>
+ 
                                         <div class="menu-item me-lg-1">
 											<a class="menu-link  py-3" href="#">
 												<span class="text-dark fw-bolder">About</span>
@@ -111,7 +113,7 @@
 					<!--begin::Aside-->
 					<div id="kt_aside" class="aside" data-kt-drawer="true" data-kt-drawer-name="aside" data-kt-drawer-activate="{default: true, lg: false}" data-kt-drawer-overlay="true" data-kt-drawer-width="{default:'200px', '300px': '225px'}" data-kt-drawer-direction="start" data-kt-drawer-toggle="#kt_aside_toggle" data-kt-sticky="true" data-kt-sticky-name="aside-sticky" data-kt-sticky-offset="{default: false, lg: '1px'}" data-kt-sticky-width="{lg: '225px'}" data-kt-sticky-left="auto" data-kt-sticky-top="94px" data-kt-sticky-animation="false" data-kt-sticky-zindex="95">
 						<!--begin::Aside nav-->
-						<div class="hover-scroll-overlay-y my-5 my-lg-5 w-100 ps-4 ps-lg-0 pe-4 me-1" id="kt_aside_menu_wrapper" data-kt-scroll="true" data-kt-scroll-activate="{default: false, lg: true}" data-kt-scroll-height="auto" data-kt-scroll-dependencies="#kt_header" data-kt-scroll-wrappers="#kt_aside" data-kt-scroll-offset="5px">
+						<div class="hover-scroll-overlay-y my-5 my-lg-5 w-100 ps-4 ps-lg-0 pe-4 me-1" id="kt_aside_menu_wrapper" >
 
                                             <!--begin::Input group-->
                                             <div class="mb-5">
@@ -119,7 +121,7 @@
                                                 @php $chapter=\App\Models\Surah::find($result['chapter'])->first(); @endphp 
                                                 <div class="menu-item">
                                                     <span class="menu-link">
-                                                        @if ($chapter)<span class="menu-title"> {{ $chapter['title'] }} -  {{ $chapter['transliteration'] }}   </span> @endif
+                                                        @if ($chapter)<span class="menu-title"> {{ $chapter['arabic'] }} -  {{ $chapter['latin'] }}   </span> @endif
                                                     </span>
                                                 </div>
 
@@ -133,7 +135,8 @@
                                                 @if(!empty($item) and $item!='yes')
                                                 <div class="menu-item">
                                                     <span class="menu-link">
-                                                         <span class="menu-title"> {{$item}}   </span> 
+														@php $topic=\App\Models\Topic::where('tag',$item)->first(); @endphp 				
+                                                         <span class="menu-title"> {{$topic['name']}}   </span> 
                                                     </span>
                                                 </div>
                                                 @endif
@@ -148,7 +151,8 @@
                                                 @if(!empty($item) and $item!='yes')
                                                 <div class="menu-item">
                                                     <span class="menu-link">
-                                                         <span class="menu-title"> {{$item}}   </span> 
+														@php $subtopic=\App\Models\Subtopic::where('tag',$item)->first(); @endphp 				
+														<span class="menu-title"> {{$subtopic['name']}}   </span> 
                                                     </span>
                                                 </div>
                                                 @endif
@@ -211,7 +215,7 @@
 											<span class="fs-1 fw-bolder text-gray-900 text-hover-primary me-1">﴿ {{$result['ayahTitle']}}  ﴾</span>
 											<!--end::Title-->
                                             @php $chapter=\App\Models\Surah::find($result['chapter'])->first(); @endphp 				
-                                            @if ($chapter)<span class="fs-4 fw-bolder text-muted text-hover-primary me-1"> [{{ $chapter['title'] }} -  {{ explode('.',$result['ayah'])[1] }}]   </span> @endif
+                                            @if ($chapter)<span class="fs-4 fw-bolder text-muted text-hover-primary me-1"> [{{ $chapter['arabic'] }} -  {{ explode('.',$result['ayah'])[1] }}]   </span> @endif
                                             </span>
 										</div>
 										<!--end::Head-->
@@ -240,33 +244,33 @@
 								</div>
 
 							</div>
-							<div class="footer pt-10 pb-5 d-flex flex-column flex-md-row flex-stack" id="kt_footer" style="background-color: #757052;padding-left: 40px;padding-right: 40px;">
-								<!--begin::Copyright-->
-								<div class="text-dark order-2 order-md-1">
-									<span class="text-white fw-semibold me-1">2022©</span>
-								</div>
-								<!--end::Copyright-->
-								<!--begin::Menu-->
-								<ul class="menu fw-semibold order-1">
-									<li class="menu-item">
-										<a href="/topics?surah=&amp;chart=packedbubble"  class="text-white  px-2">Graph</a>
-									</li>
-									<li class="menu-item">
-										<a href="/search"  class="text-white  px-2">Search</a>
-									</li>
-									<li class="menu-item">
-										<a href="/about"  class="text-white  ps-2 pe-0">About</a>
-									</li>
-								</ul>
-								<!--end::Menu-->
-							</div>
+						
 							<!--end::Post-->
 						</div>
 						<!--end::Content-->
 
 					</div>
 					<!--end::Wrapper-->
-
+					<div class="footer pt-10 pb-5 d-flex flex-column flex-md-row flex-stack" id="kt_footer" style="background-color: #757052;padding-left: 40px;padding-right: 40px;">
+						<!--begin::Copyright-->
+						<div class="text-dark order-2 order-md-1">
+							<span class="text-white fw-semibold me-1">2022©</span>
+						</div>
+						<!--end::Copyright-->
+						<!--begin::Menu-->
+						<ul class="menu fw-semibold order-1">
+							<li class="menu-item">
+								<a href="/topics?surah=&amp;chart=packedbubble"  class="text-white  px-2">Graph</a>
+							</li>
+							<li class="menu-item">
+								<a href="/search"  class="text-white  px-2">Search</a>
+							</li>
+							<li class="menu-item">
+								<a href="/about"  class="text-white  ps-2 pe-0">About</a>
+							</li>
+						</ul>
+						<!--end::Menu-->
+					</div>
 				</div>
 				<!--end::Container-->
 			</div>

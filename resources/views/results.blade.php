@@ -70,15 +70,16 @@
 									<!--begin::Menu-->
 									<div class="menu menu-lg-rounded menu-column menu-lg-row menu-state-bg menu-title-gray-700 menu-state-title-primary menu-state-icon-primary menu-state-bullet-primary menu-arrow-gray-400 fw-bold my-5 my-lg-0 align-items-stretch" id="#kt_header_menu" data-kt-menu="true">
 										<div class="menu-item me-lg-1">
+											<a class="menu-link  active py-3" href="{{'/'}}">
+												<span class="text-dark fw-bolder">Search</span>
+											</a>
+										</div>
+										<div class="menu-item me-lg-1">
 											<a class="menu-link   py-3" href="/topics?surah=&chart=packedbubble">
 												<span class="text-dark fw-bolder">Graph</span>
 											</a>
 										</div>
-                                        <div class="menu-item me-lg-1">
-											<a class="menu-link  active py-3" href="{{'/search'}}">
-												<span class="text-dark fw-bolder">Search</span>
-											</a>
-										</div>
+
                                         <div class="menu-item me-lg-1">
 											<a class="menu-link  py-3" href="#">
 												<span class="text-dark fw-bolder">About</span>
@@ -120,7 +121,7 @@
 											<select name="filter[surah][]" class="form-select form-select-solid" data-control="select2" data-close-on-select="false" data-placeholder="سورة  Surah" data-allow-clear="true" multiple="multiple">
 												<option></option>
 												@foreach (\App\Models\Surah::get() as $surah)
-												<option value="{{ $surah->id}}">{!! str_replace('سورة', ' ', $surah->title) !!} - {{ $surah->transliteration }}</option>
+												<option value="{{ $surah->id}}">{!! str_replace('سورة', ' ', $surah->arabic) !!} - {{ $surah->latin }}</option>
 												@endforeach
 											</select>
 										</div>
@@ -134,7 +135,7 @@
 												<option></option>
 												@foreach (\App\Models\Topic::groupBy('name')->get()->toArray() as $topic)
 												@if(!empty($topic['name']))
-												<option value="{{$topic['name']}}">{{$topic['name']}}</option>
+												<option value="{{$topic['tag']}}">{{$topic['name']}}</option>
 												@endif
 												@endforeach
 											</select>
@@ -148,7 +149,7 @@
 												<option></option>
 												@foreach (\App\Models\Subtopic::groupBy('name')->get()->toArray() as $topic)
 												@if(!empty($subtopic['name']))
-												<option value="{{$subtopic['name']}}">{{$subtopic['name']}}</option>
+												<option value="{{$subtopic['tag']}}">{{$subtopic['name']}}</option>
 												@endif
 												@endforeach
 											</select>
@@ -215,7 +216,7 @@
 							<!--end::Page title-->
 							<div class="d-flex align-items-center py-1">
 								<!--begin::Button-->
-								<a href="{{'/search'}}" class="btn btn-warning fw-bolder btn-text-dark border-0 fs-6 h-40px" id="kt_toolbar_primary_button">back to search</a>
+								<a href="{{'/'}}" class="btn btn-warning fw-bolder btn-text-dark border-0 fs-6 h-40px" id="kt_toolbar_primary_button">back to search</a>
 								<!--end::Button-->
 							</div>
 
@@ -231,12 +232,14 @@
 																	   
 								<div class="mb-0">
 									<div class="d-flex align-items-center mb-4">
+										@php $ayah=\App\Models\Ayah::where('surah_id',$item['_source']['chapter'])->where('ayah_number',explode('.',$item['_source']['ayah'])[1])->first(); @endphp 				
 
 										<!--begin::Title-->
-										<span class="fs-1 fw-bolder text-gray-900 text-hover-primary me-1">﴿ {{$item['_source']['ayahTitle']}} ﴾</span>
+										<span class="fs-1 fw-bolder text-gray-900 text-hover-primary me-1">﴿ {{ $item['_source']['ayahTitle'] }}﴾</span>
 										<!--end::Title-->
-										@php $chapter=\App\Models\Surah::where('id',$item['_source']['chapter'])->first(); @endphp 				
-										@if ($chapter)<span class="fs-4 fw-bolder text-muted text-hover-primary me-1"> [ {{ $chapter['title'] }} -  {{ explode('.',$item['_source']['ayah'])[1] }} ]  </span> @endif @if($item['_source']['vol'])  <span class="fs-4 fw-bolder text-dark text-hover-primary me-1">  Page {{$item['_source']['vol']}} </span>@endif
+										@php $chapter=\App\Models\Surah::where('id',$item['_source']['chapter'])->first(); @endphp 
+				
+										@if ($chapter)<span class="fs-4 fw-bolder text-muted text-hover-primary me-1"> [ {{ $chapter['arabic'] }} -  {{ explode('.',$item['_source']['ayah'])[1] }} ]  </span> @endif @if($item['_source']['vol'])  <span class="fs-4 fw-bolder text-dark text-hover-primary me-1">  Page {{$item['_source']['vol']}} </span>@endif
 										
 									</div>
 									<!--end::Head-->
@@ -246,37 +249,39 @@
 										@if(isset($item['highlight']['content.arabic_synonym_normalized']))
 											@foreach ($item['highlight']['content.arabic_synonym_normalized'] as $highlight)
 												<?php
-												echo $highlight; 
+												echo str_replace('/', '', preg_replace('/[0-9]+/', '', $highlight)); 
 												?>
 											@endforeach
 										@elseif(isset($item['highlight']['content.rebuilt_arabic']))
 											@foreach ($item['highlight']['content.rebuilt_arabic'] as $highlight)
 												<?php
-												echo $highlight; 
+												echo str_replace('/', '', preg_replace('/[0-9]+/', '', $highlight)); 
 												?>
 											@endforeach
 										@elseif(isset($item['highlight']['content.boolean_sim_field']))
 											@foreach ($item['highlight']['content.boolean_sim_field'] as $highlight)
 												<?php
-												echo $highlight; 
+												echo str_replace('/', '', preg_replace('/[0-9]+/', '', $highlight)); 
 												?>
 											@endforeach
 										@elseif(isset($item['highlight']['content']))
 											@foreach ($item['highlight']['content'] as $highlight)
 												<?php
-												echo $highlight; 
+												echo str_replace('/', '', preg_replace('/[0-9]+/', '', $highlight)); 
 												?>
 											@endforeach
 										@elseif(isset($item['highlight']['content.autocomplete_arabic']))
 										@foreach ($item['highlight']['content.autocomplete_arabic'] as $highlight)
 											<?php
-											echo $highlight; 
+												echo str_replace('/', '', preg_replace('/[0-9]+/', '', $highlight)); 
 											?>
 										@endforeach
 										@else
 											
 												<?php
-												echo $item['_source']['content']; 
+												echo str_replace('/', '', preg_replace('/[0-9]+/', '', $item['_source']['content'])); 
+
+												// echo $item['_source']['content']; 
 												?>
 											
 										@endif
@@ -348,7 +353,7 @@
 						<a href="/topics?surah=&amp;chart=packedbubble"  class="text-white  px-2">Graph</a>
 					</li>
 					<li class="menu-item">
-						<a href="/search"  class="text-white  px-2">Search</a>
+						<a href="/"  class="text-white  px-2">Search</a>
 					</li>
 					<li class="menu-item">
 						<a href="/about"  class="text-white  ps-2 pe-0">About</a>

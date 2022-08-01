@@ -27,7 +27,7 @@ Route::get('/subtopics', function () {
   
     return view('subtopics');
 });
-Route::get('/search', function () {
+Route::get('/', function () {
   
     return view('search');
 });
