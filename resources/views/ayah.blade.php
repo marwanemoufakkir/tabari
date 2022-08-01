@@ -121,7 +121,7 @@
                                                 @php $chapter=\App\Models\Surah::find($result['chapter'])->first(); @endphp 
                                                 <div class="menu-item">
                                                     <span class="menu-link">
-                                                        @if ($chapter)<span class="menu-title"> {{ $chapter['arabic'] }} -  {{ $chapter['latin'] }}   </span> @endif
+                                                        @if ($chapter)<span class="menu-title"> {{ $chapter['title'] }} -  {{ $chapter['transliteration'] }}   </span> @endif
                                                     </span>
                                                 </div>
 
@@ -215,7 +215,7 @@
 											<span class="fs-1 fw-bolder text-gray-900 text-hover-primary me-1">﴿ {{$result['ayahTitle']}}  ﴾</span>
 											<!--end::Title-->
                                             @php $chapter=\App\Models\Surah::find($result['chapter'])->first(); @endphp 				
-                                            @if ($chapter)<span class="fs-4 fw-bolder text-muted text-hover-primary me-1"> [{{ $chapter['arabic'] }} -  {{ explode('.',$result['ayah'])[1] }}]   </span> @endif
+                                            @if ($chapter)<span class="fs-4 fw-bolder text-muted text-hover-primary me-1"> [{{ $chapter['title'] }} -  {{ explode('.',$result['ayah'])[1] }}]   </span> @endif
                                             </span>
 										</div>
 										<!--end::Head-->
@@ -263,7 +263,7 @@
 								<a href="/topics?surah=&amp;chart=packedbubble"  class="text-white  px-2">Graph</a>
 							</li>
 							<li class="menu-item">
-								<a href="/search"  class="text-white  px-2">Search</a>
+								<a href="/"  class="text-white  px-2">Search</a>
 							</li>
 							<li class="menu-item">
 								<a href="/about"  class="text-white  ps-2 pe-0">About</a>

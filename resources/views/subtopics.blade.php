@@ -61,7 +61,7 @@
 											</a>
 										</div>
                                         <div class="menu-item me-lg-1">
-											<a class="menu-link   py-3" href="{{'/search'}}">
+											<a class="menu-link   py-3" href="{{'/'}}">
 												<span class="text-dark fw-bolder">Search</span>
 											</a>
 										</div>
@@ -94,7 +94,7 @@
                                 <!--begin::Heading-->
                                 <div class="menu-item">
                                     <div class="menu-content pb-2">
-                                        <span class="menu-section text-muted text-uppercase fs-7 fw-bolder">Dashboard MENU</span>
+                                        <span class="menu-section text-muted text-uppercase fs-7 fw-bolder">Graph MENU</span>
                                     </div>
                                 </div>
                                 <!--end::Heading-->
@@ -115,7 +115,7 @@
 								</div>
 								<!--end::Menu item-->
 								<!--begin::Menu item-->
-								<div class="menu-item">
+								{{-- <div class="menu-item">
 									<a href="/rawi?surah=&chart=packedbubble" class="menu-link">
 										<span class="menu-title">Rawi</span>
 										
@@ -128,7 +128,7 @@
 										<span class="menu-title">Location</span>
 										
 									</a>
-								</div>
+								</div> --}}
 								<!--end::Menu item-->
                                     <!--end::Input group-->
 								<!--end::Heading-->
@@ -183,14 +183,14 @@
 								<div class="page-title d-flex flex-column py-1">
 									<!--begin::Title-->
 									<h1 class="d-flex align-items-center my-1">
-										<span class="text-dark fw-bolder fs-1">Dashboard</span>
+										<span class="text-dark fw-bolder fs-1">Graph</span>
 									</h1>
 									<!--end::Title-->
 									<!--begin::Breadcrumb-->
 									<ul class="breadcrumb breadcrumb-separatorless fw-bold fs-7 my-1">
 										<!--begin::Item-->
 										<li class="breadcrumb-item text-muted">
-											<a href="../../demo5/dist/index.html" class="text-muted text-hover-primary">Dashboard</a>
+											<a href="../../demo5/dist/index.html" class="text-muted text-hover-primary">Graph</a>
 										</li>
 										<!--end::Item-->
 										<!--begin::Item-->
@@ -254,7 +254,7 @@
 									<a href="/topics?surah=&amp;chart=packedbubble"  class="text-white  px-2">Graph</a>
 								</li>
 								<li class="menu-item">
-									<a href="/search"  class="text-white  px-2">Search</a>
+									<a href="/"  class="text-white  px-2">Search</a>
 								</li>
 								<li class="menu-item">
 									<a href="/about"  class="text-white  ps-2 pe-0">About</a>
@@ -298,6 +298,17 @@ $(document).ready(function () {
 	  var surah= '{{ request()->has("surah") ? request()->get("surah") : "" }}'
 	  var chart= '{{ request()->has("chart") ? request()->get("chart") : "packedbubble" }}'
 
+
+	  @php 
+			$title='Subtopics in the whole book';
+			$subtitle='مواضيع في الكتاب كله';
+			if(request()->surah!=''){
+				$chapter=\App\Models\Surah::where('id',request()->surah)->first(); 
+				$title='Topics in the '. $chapter['transliteration'];
+				$subtitle='مواضيع في  '.$chapter['title'];
+			}
+	
+		@endphp 
       var hadithData=[]; 
       var nothadithData=[]; 
 	  var hadithDataPie=[]; 
@@ -346,11 +357,11 @@ $(document).ready(function () {
 					type: 'pie'
 				},
 				title: {
-                    text: 'Subtopics in the whole book'
+                    text: '{{$title}}'
                 },
                 subtitle: {
-                    text: 'مواضيع في الكتاب كله'
-                },
+						text:'{{$subtitle}} '              
+					},
 				tooltip: {
 					pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
 				},
@@ -409,12 +420,12 @@ $(document).ready(function () {
                     type: 'packedbubble',
                     height: '80%'
                 },
-                title: {
-                    text: 'Subtopics in the whole book'
+				title: {
+                    text: '{{$title}}'
                 },
                 subtitle: {
-                    text: 'مواضيع في الكتاب كله'
-                },
+						text:'{{$subtitle}} '              
+					},
                 legend: {
                     layout: 'vertical',
                     align: 'left',

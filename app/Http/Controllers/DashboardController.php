@@ -28,12 +28,12 @@ class DashboardController extends Controller
     function topicsBubble(Request $request){
 
         $aggregation=array();
-        $topics=Topic::get('name');
+        $topics=Topic::get('tag');
         
         $boolQuery=new BoolQuery();
         foreach ($topics->toArray() as $key => $value) {
-            if(!empty($value['name'])){
-                $aggregation[$value['name']]=new TermQuery('topic',  $value['name']);
+            if(!empty($value['tag'])){
+                $aggregation[$value['tag']]=new TermQuery('topic',  $value['tag']);
 
             }
         }
@@ -69,7 +69,7 @@ class DashboardController extends Controller
 
         $queryArray = $search->toArray();
         $searchParams = [
-            'index' => 'my-tafsir',
+            'index' => 'my-tafsir2',
             'body' => $queryArray,
         ];
         
@@ -81,12 +81,12 @@ class DashboardController extends Controller
     function subtopicsBubble(Request $request){
 
         $aggregation=array();
-        $topics=Topic::get('name');
+        $topics=Topic::get('tag');
         
         $boolQuery=new BoolQuery();
         foreach ($topics->toArray() as $key => $value) {
-            if(!empty($value['name'])){
-                $aggregation[$value['name']]=new TermQuery('subtopic',  $value['name']);
+            if(!empty($value['tag'])){
+                $aggregation[$value['tag']]=new TermQuery('subtopic',  $value['tag']);
 
             }
         }
@@ -122,7 +122,7 @@ class DashboardController extends Controller
 
         $queryArray = $search->toArray();
         $searchParams = [
-            'index' => 'my-tafsir',
+            'index' => 'my-tafsir2',
             'body' => $queryArray,
         ];
         

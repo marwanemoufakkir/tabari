@@ -223,7 +223,7 @@
                                                                                 <option value=""></option>
                                                                                 
                                                                                 @foreach (\App\Models\Surah::get() as $surah)
-                                                                                <option value="{{ $surah->id }}">{!! str_replace('سورة', ' ', $surah->arabic) !!} - {{ $surah->latin }}</option>
+                                                                                <option value="{{ $surah->id }}">{!! str_replace('سورة', ' ', $surah->title) !!} - {{ $surah->transliteration }}</option>
                                                                                 @endforeach
                                                                             </select>
                                                                         </div>
@@ -360,7 +360,7 @@
                             <a href="/topics?surah=&amp;chart=packedbubble"  class="text-white  px-2">Graph</a>
                         </li>
                         <li class="menu-item">
-                            <a href="/search"  class="text-white  px-2">Search</a>
+                            <a href="/"  class="text-white  px-2">Search</a>
                         </li>
                         <li class="menu-item">
                             <a href="/about"  class="text-white  ps-2 pe-0">About</a>
@@ -437,7 +437,7 @@
                                 $.each(result.data, function (key, value) {
                                     if(value.ayah_number!=0){
                                         ayahQuerySelector.prop("disabled", false); // are now enabled.
-                                        ayahQuerySelector.append('<option value="' + value.surah_id+"."+value.ayah_number + '">' + value.ayah_number + '</option>');
+                                        ayahQuerySelector.append('<option value="' + value.surah_id+"."+value.number + '">' + value.number + '</option>');
                                     }
 
                                     
@@ -476,10 +476,10 @@
                                 $('[data-kt-repeater="select2"]:eq(2)').empty();
                                 $('[data-kt-repeater="select2"]:eq(2)').append('<option value=""></option>');
                                 $.each(result.data, function (key, value) {
-                                    if(value.ayah_number!=0){
+                                    if(value.number!=0){
 
                                     $('[data-kt-repeater="select2"]:eq(2)').prop("disabled", false); // are now enabled.
-                                    $('[data-kt-repeater="select2"]:eq(2)').append('<option value="' + value.surah_id+"."+value.ayah_number + '">' + value.ayah_number + '</option>');
+                                    $('[data-kt-repeater="select2"]:eq(2)').append('<option value="' + value.surah_id+"."+value.number + '">' + value.number + '</option>');
                                     
                                     }
                                 });

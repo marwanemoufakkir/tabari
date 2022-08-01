@@ -52,10 +52,10 @@ class ParsingFiles extends Command
      */
     public function handle()
     {
-        $params = ['index' => 'my-tafsir'];
+        $params = ['index' => 'my-tafsir2'];
         $response = $this->elasticsearch->indices()->delete($params);
         $params = [
-            'index' => 'my-tafsir',
+            'index' => 'my-tafsir2',
             'body' => [
 
               "settings"=>[
@@ -120,6 +120,13 @@ class ParsingFiles extends Command
                         "arabic_keywords"
                       ]
                     ],
+                    "exact_arabic"=>[
+                      "tokenizer"=>"standard",
+                      "filter"=>[
+                        "decimal_digit",
+                        "arabic_normalization"
+                      ]
+                    ],
                     "rebuilt_arabic"=>[
                       "tokenizer"=>"standard",
                       "filter"=>[
@@ -164,6 +171,10 @@ class ParsingFiles extends Command
                             "rebuilt_arabic"=>[
                               "type"=>"text",
                               "analyzer"=>"rebuilt_arabic"
+                            ],
+                            "exact_arabic"=>[
+                              "type"=>"text",
+                              "analyzer"=>"exact_arabic"
                             ],
                             "arabic_synonym_normalized"=>[
                               "type"=>"text",
@@ -249,7 +260,7 @@ class ParsingFiles extends Command
                 $query = "//tei:div[@type='section']";
                 
                 $elements = $xpath->query($query);
-                
+                $lstvolPage='1:136';
 
                 foreach ($elements as $element) {
                 
@@ -263,13 +274,7 @@ class ParsingFiles extends Command
                     
                 
                     foreach ($ayahs as  $id=> $value) {
-                      // if(empty($value->getattribute("n"))){
-                      //   $number = $element->getattribute("n");
 
-                      // }else{
-                      //   $number = $value->getattribute("n");
-
-                      // }
                       $number = $value->getattribute("n");
                         $title = $value->nodeValue;
                         
@@ -287,23 +292,24 @@ class ParsingFiles extends Command
                         $listExplode = explode(' ' ,$list);
                         $pers=[];
                         $volPage='';
-                        $lstvolPage='';
+
                         $subtopics = $xpath->query("./tei:seg", $topic);
                         foreach ($subtopics as $key => $value) {
                             $analist = $value->getattribute("ana");
                             $subtopicList.=' '.trim($value->getattribute("ana"));
                         }
 
-                        $pb = $xpath->query("./tei:pb[@type='turki'] | ./tei:said/tei:pb[@type='turki'] | ./tei:seg/tei:pb[@type='turki'] | ./tei:quote/tei:seg/tei:pb[@type='turki']", $topic);
-                        
+                        $pb = $xpath->evaluate("./tei:pb[@type='turki'] | ./tei:said/tei:pb[@type='turki'] | ./tei:seg/tei:pb[@type='turki'] | ./tei:quote/tei:seg/tei:pb[@type='turki']", $topic);
                         foreach ($pb as $key => $vol) {
-                          
-                           
-                            $volPage=$vol->getattribute("n");
-                         
-                          
+                          $volPage=$vol->getattribute("n");
                         }
-                        
+                        if(!empty($volPage)){
+                          $lstvolPage=$volPage;
+                        }else{
+                          $volPage=$lstvolPage;
+
+                        }
+
                         $persName = $xpath->query("./tei:persName", $topic);
                         foreach ($persName as $key => $per) {
                             $persNameType = $per->getattribute("ana");
@@ -319,7 +325,7 @@ class ParsingFiles extends Command
                         $json = preg_replace('/(\s+)?\\\t(\s+)?/', ' ', json_encode(array("chapter"=>explode(".", $number)[0],"ayah" => $number, "ayahTitle" => trim($title),"content"=>trim($topic->nodeValue),"xml_content"=>$htmlString,"type"=> $type,'topic' => $list,'subtopic' => $subtopicList,'narrator'=> $pers,'vol'=>$volPage,'timestamp' => strtotime("-1d")), JSON_UNESCAPED_UNICODE));
                         $json = preg_replace('/(\s+)?\\\n(\s+)?/', ' ',$json);
                         $result=$this->elasticsearch->index([
-                          'index' => 'my-tafsir',
+                          'index' => 'my-tafsir2',
                              'type' => '_doc',
                              'body'=>json_decode($json)
                        ]);
@@ -328,9 +334,6 @@ class ParsingFiles extends Command
                     
                 
                     $section = array();
-                    // $section["ayah"] = $chapters;
-                    // $section["content"] = $element->nodeValue;
-                    // $section["paraghraphe"]=$topicList;
                     $sections[]=$topicList;
                     $csv[]=$ayahTable;
 
@@ -338,43 +341,7 @@ class ParsingFiles extends Command
                     
                     
                 }
-                // foreach ($elements  as $key => $element) {
-                //     $chapters = array();
-                //     $topicList=array();
-                    
-                //     $ayahs = $xpath->query("./tei:head/tei:quote", $element);
-                //     $topics = $xpath->query("./tei:p", $element);
-                    
-                //     foreach ($ayahs as $value) {
-                //         $number = $value->getattribute("n");
-                //         $title = $value->nodeValue;
-                //         $chapters = array("chapterNumber"=>explode(":", $number)[0],"ayahNumber" => $number, "title" => $title);
-                //     }
-                //     foreach ($topics  as $key => $topic) {
-                        
-                //         $type = $topic->getattribute("n");
-                //         $list = $topic->getattribute("ana");
-                //         $subtopics = $xpath->query("./tei:seg", $topic);
-                //         $subtopicList=array();
-                //         foreach ($subtopics as $key => $value) {
-                //             $analist = $value->getattribute("ana");
-                //             $subtopicList[] = array("text"=>$value->nodeValue,'subtopics' => $analist);
-                //         }
-                //         $topicList[] = array("xml_text"=> $doc->saveHTML($topic),"text"=>$topic->nodeValue,"type"=> $type,'topic' => $list,'subtopic' => $subtopicList);
-                //     }
-                //     $section = array();
-                //     $section["ayah"] = $chapters;
-                //     $section["content"] = $element->nodeValue;
-                //     $section["paraghraphe"]=$topicList;
-                //     $sections[]=$section;
-                    
 
-                // }
-
-                  
-                // $json = preg_replace('/(\s+)?\\\t(\s+)?/', ' ', json_encode($sections, JSON_UNESCAPED_UNICODE));
-                // $json = preg_replace('/(\s+)?\\\n(\s+)?/', ' ',$json);
-         
             }
             
             return  json_decode($json);

@@ -121,7 +121,7 @@
 											<select name="filter[surah][]" class="form-select form-select-solid" data-control="select2" data-close-on-select="false" data-placeholder="سورة  Surah" data-allow-clear="true" multiple="multiple">
 												<option></option>
 												@foreach (\App\Models\Surah::get() as $surah)
-												<option value="{{ $surah->id}}">{!! str_replace('سورة', ' ', $surah->arabic) !!} - {{ $surah->latin }}</option>
+												<option value="{{ $surah->id}}">{!! str_replace('سورة', ' ', $surah->title) !!} - {{ $surah->transliteration }}</option>
 												@endforeach
 											</select>
 										</div>
@@ -134,9 +134,7 @@
 											<select name="filter[topic][]" class="form-select form-select-solid" data-control="select2" data-close-on-select="false" data-placeholder="موضوع Topic" data-allow-clear="true" multiple="multiple">
 												<option></option>
 												@foreach (\App\Models\Topic::groupBy('name')->get()->toArray() as $topic)
-												@if(!empty($topic['name']))
 												<option value="{{$topic['tag']}}">{{$topic['name']}}</option>
-												@endif
 												@endforeach
 											</select>
 
@@ -147,10 +145,8 @@
 											<label class="fs-6 form-label fw-bolder text-dark">موضوع فرعي Subtopic</label>
 											<select name="filter[subtopic][]" class="form-select form-select-solid" data-control="select2" data-close-on-select="false" data-placeholder="موضوع فرعي Subtopic" data-allow-clear="true" multiple="multiple">
 												<option></option>
-												@foreach (\App\Models\Subtopic::groupBy('name')->get()->toArray() as $topic)
-												@if(!empty($subtopic['name']))
+												@foreach (\App\Models\Subtopic::groupBy('name')->get()->toArray() as $subtopic )
 												<option value="{{$subtopic['tag']}}">{{$subtopic['name']}}</option>
-												@endif
 												@endforeach
 											</select>
 
@@ -227,19 +223,20 @@
 
 								<!--end::Aside-->
 							<!--begin::Questions-->
+							@if($result)
 							<div class="mb-10">
 							   @foreach ($result as $item)
 																	   
 								<div class="mb-0">
 									<div class="d-flex align-items-center mb-4">
-										@php $ayah=\App\Models\Ayah::where('surah_id',$item['_source']['chapter'])->where('ayah_number',explode('.',$item['_source']['ayah'])[1])->first(); @endphp 				
+										{{-- @php $ayah=\App\Models\Ayah::where('surah_id',$item['_source']['chapter'])->where('number',explode('.',$item['_source']['ayah'])[1])->first(); @endphp 				 --}}
 
 										<!--begin::Title-->
 										<span class="fs-1 fw-bolder text-gray-900 text-hover-primary me-1">﴿ {{ $item['_source']['ayahTitle'] }}﴾</span>
 										<!--end::Title-->
 										@php $chapter=\App\Models\Surah::where('id',$item['_source']['chapter'])->first(); @endphp 
 				
-										@if ($chapter)<span class="fs-4 fw-bolder text-muted text-hover-primary me-1"> [ {{ $chapter['arabic'] }} -  {{ explode('.',$item['_source']['ayah'])[1] }} ]  </span> @endif @if($item['_source']['vol'])  <span class="fs-4 fw-bolder text-dark text-hover-primary me-1">  Page {{$item['_source']['vol']}} </span>@endif
+										@if ($chapter)<span class="fs-4 fw-bolder text-muted text-hover-primary me-1"> [ {{ $chapter['title'] }} -  {{ explode('.',$item['_source']['ayah'])[1] }} ]  </span> @endif @if($item['_source']['vol'])  <span class="fs-4 fw-bolder text-dark text-hover-primary me-1">  Page {{$item['_source']['vol']}} </span>@endif
 										
 									</div>
 									<!--end::Head-->
@@ -264,8 +261,8 @@
 												echo str_replace('/', '', preg_replace('/[0-9]+/', '', $highlight)); 
 												?>
 											@endforeach
-										@elseif(isset($item['highlight']['content']))
-											@foreach ($item['highlight']['content'] as $highlight)
+										@elseif(isset($item['highlight']['content.exact_arabic']))
+											@foreach ($item['highlight']['content.exact_arabic'] as $highlight)
 												<?php
 												echo str_replace('/', '', preg_replace('/[0-9]+/', '', $highlight)); 
 												?>
@@ -327,8 +324,14 @@
 							   @endforeach
 
 							</div>
-
+							@endif
 						</div>
+						
+						<div class="d-flex flex-center mb-4">
+
+							{!! $pagination->appends(Request::capture()->except('page'))->links('vendor.pagination.custom')!!}
+						 </div>
+
 						<!--end::Post-->
 					</div>
 					<!--end::Content-->
