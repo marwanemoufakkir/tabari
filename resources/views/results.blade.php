@@ -235,7 +235,7 @@
 										@php $ayah=\App\Models\Ayah::where('surah_id',$item['_source']['chapter'])->where('ayah_number',explode('.',$item['_source']['ayah'])[1])->first(); @endphp 				
 
 										<!--begin::Title-->
-										<span class="fs-1 fw-bolder text-gray-900 text-hover-primary me-1">﴿ {{ $ayah['ayah'] }}﴾</span>
+										<span class="fs-1 fw-bolder text-gray-900 text-hover-primary me-1">﴿ {{ $item['_source']['ayahTitle'] }}﴾</span>
 										<!--end::Title-->
 										@php $chapter=\App\Models\Surah::where('id',$item['_source']['chapter'])->first(); @endphp 
 				
