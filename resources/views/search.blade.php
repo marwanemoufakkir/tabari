@@ -55,7 +55,7 @@
                         </div>
                         <!--end::Aside mobile toggle-->
                         <!--begin::Logo-->
-                        <a href="../../demo5/dist/index.html">
+                        <a href="/">
                             <img alt="Logo" src="assets/media/logos/LOGO-x76x53.png" class="d-none d-lg-inline h-50px" />
                             <img alt="Logo" src="assets/media/logos/LOGO-x76x53.png" class="d-lg-none h-40px" />
                         </a>
@@ -201,8 +201,7 @@
                                                                             <select name="search_type" class="form-select form-select-solid"  data-kt-repeater="select2"  data-placeholder="Default" >
                                                                                 <option value="default" selected="selected">Default</option>
                                                                                 <option value="exact">Exact</option>
-                                                                                <option value="synonym" >Synonym</option>
-                                                                                <option value="similarity">Similarity</option>
+                                    
                                                                             </select>
                                                                         </div>
                                                                         <div class="position-relative w-md-400px me-md-2">
@@ -214,7 +213,7 @@
                                                                                 </svg>
                                                                             </span>
                                                                             <!--end::Svg Icon-->
-                                                                            <input type="text" class="form-control form-control-solid ps-10" name="content" value="" placeholder="Search" />
+                                                                            <input type="text" class="form-control form-control-solid ps-10" name="content" value="" placeholder=" بحث  search" />
                                                                         </div>
                                                                     </div>
                                                                     <div class="form-group row mb-5">
@@ -224,7 +223,7 @@
                                                                                 <option value=""></option>
                                                                                 
                                                                                 @foreach (\App\Models\Surah::get() as $surah)
-                                                                                <option value="{{ $surah->id }}">{!! str_replace('سورة', ' ', $surah->title) !!} - {{ $surah->transliteration }}</option>
+                                                                                <option value="{{ $surah->id }}">{!! str_replace('سورة', ' ', $surah->arabic) !!} - {{ $surah->latin }}</option>
                                                                                 @endforeach
                                                                             </select>
                                                                         </div>
@@ -242,7 +241,7 @@
                                                                                     \DB::statement("SET SQL_MODE=''");
                                                                                 @endphp
                                                                                 @foreach (\App\Models\Topic::groupBy('name')->get()->toArray() as $topic)
-                                                                                <option value="{{ $topic['name']}}">{{ $topic['name']}}</option>
+                                                                                <option value="{{ $topic['tag']}}">{{ $topic['name']}}</option>
                                                                                 @endforeach
                                                                             </select>
                                                                         </div>
@@ -251,7 +250,7 @@
                                                                             <select name="subtopic" class="form-select form-select-solid" data-kt-repeater="select2" data-placeholder="موضوع فرعي Subtopic" >
                                                                                 <option value=""></option>
                                                                                 @foreach (\App\Models\Subtopic::groupBy('name')->get()->toArray() as $subtopic)
-                                                                                <option value="{{ $subtopic['name']}}">{{ $subtopic['name']}}</option>
+                                                                                <option value="{{ $subtopic['tag']}}">{{ $subtopic['name']}}</option>
                                                                                 @endforeach
                                                                             </select>
                                                                         </div>
@@ -273,19 +272,19 @@
                                                                                 <!--begin::Option-->
                                                                                 <label>
                                                                                     <input type="radio" class="btn-check" name="bool" value="MUST" checked="checked" />
-                                                                                    <span class="btn btn-active btn-active-warning fw-bolder btn-text-dark px-4">AND</span>
+                                                                                    <span class="btn btn-active btn-active-warning fw-bolder btn-text-dark px-4"> و AND</span>
                                                                                 </label>
                                                                                 <!--end::Option-->
                                                                                 <!--begin::Option-->
                                                                                 <label>
                                                                                     <input type="radio" class="btn-check" name="bool" value="SHOULD" />
-                                                                                    <span class="btn btn-active btn-active-warning fw-bolder btn-text-dark px-4">OR</span>
+                                                                                    <span class="btn btn-active btn-active-warning fw-bolder btn-text-dark px-4"> أو OR</span>
                                                                                 </label>
                                                                                 <!--end::Option-->
                                                                                 <!--begin::Option-->
                                                                                 <label>
                                                                                     <input type="radio" class="btn-check" name="bool" value="MUST_NOT" />
-                                                                                    <span class="btn btn-active btn-active-warning fw-bolder btn-text-dark px-4">NOT</span>
+                                                                                    <span class="btn btn-active btn-active-warning fw-bolder btn-text-dark px-4"> لا NOT</span>
                                                                                 </label>
                                                                                 <!--end::Option-->
                                                                             </div>
@@ -294,7 +293,8 @@
                                                                         <!--end::Col-->
                                                                         <div class="col-md-2 pt-3">
                                                                             
-                                                                            <a href="javascript:;" data-repeater-delete class="fw-bolder btn-text-dark btn btn-active-danger mt-3 mt-md-9">
+                                                                            <a href="javascript:;" data-repeater-delete class="btn btn-icon btn-danger fw-bolder btn-text-dark  mt-3 mt-md-9">
+                                                                                <i class="text-dark la la-remove  fs-2"></i>
                                                                             </a>
                                                                         </div>
                                                                         
@@ -308,8 +308,8 @@
                                                         <!--end::Form group-->
 
                                                         <div class="d-flex align-items-center">
-                                                            <button type="button" data-repeater-create class="btn btn-secondary me-5"><i class="text-dark la la-plus"></i> Add</button>
-                                                            <button type="submit" class="btn btn-warning fw-bolder btn-text-dark px-4 me-5"> Search</button>
+                                                            <button type="button" data-repeater-create class="btn btn-icon btn-secondary fw-bolder me-2"><i class="text-dark la la-plus"></i></button>
+                                                            <button type="submit" class="btn btn-icon btn-warning fw-bolder btn-text-dark"><i class="text-dark la la-search fs-2 fw-bolder"></i></button>
                                                         </div>
       
                                                
@@ -344,29 +344,30 @@
                         <!--end::Post-->
                     </div>
                     <!--end::Content-->
-                    <div class="footer pt-10 pb-5 d-flex flex-column flex-md-row flex-stack" id="kt_footer" style="background-color: #757052;padding-left: 40px;padding-right: 40px;">
-                        <!--begin::Copyright-->
-                        <div class="text-dark order-2 order-md-1">
-                            <span class="text-white fw-semibold me-1">2022©</span>
-                        </div>
-                        <!--end::Copyright-->
-                        <!--begin::Menu-->
-                        <ul class="menu fw-semibold order-1">
-                            <li class="menu-item">
-                                <a href="/topics?surah=&amp;chart=packedbubble"  class="text-white  px-2">Graph</a>
-                            </li>
-                            <li class="menu-item">
-                                <a href="/search"  class="text-white  px-2">Search</a>
-                            </li>
-                            <li class="menu-item">
-                                <a href="/about"  class="text-white  ps-2 pe-0">About</a>
-                            </li>
-                        </ul>
-                        <!--end::Menu-->
-                    </div>
+             
                 </div>
                 </div>
                 <!--end::Wrapper-->
+                <div class="footer pt-10 pb-5 d-flex flex-column flex-md-row flex-stack" id="kt_footer" style="background-color: #757052;padding-left: 40px;padding-right: 40px;">
+                    <!--begin::Copyright-->
+                    <div class="text-dark order-2 order-md-1">
+                        <span class="text-white fw-semibold me-1">2022©</span>
+                    </div>
+                    <!--end::Copyright-->
+                    <!--begin::Menu-->
+                    <ul class="menu fw-semibold order-1">
+                        <li class="menu-item">
+                            <a href="/topics?surah=&amp;chart=packedbubble"  class="text-white  px-2">Graph</a>
+                        </li>
+                        <li class="menu-item">
+                            <a href="/search"  class="text-white  px-2">Search</a>
+                        </li>
+                        <li class="menu-item">
+                            <a href="/about"  class="text-white  ps-2 pe-0">About</a>
+                        </li>
+                    </ul>
+                    <!--end::Menu-->
+                </div>
             </div>
             <!--end::Container-->
         </div>
@@ -431,12 +432,14 @@
                             },
                             dataType: 'json',
                             success: function (result) {
-                                console.log(result.data)
                                ayahQuerySelector.empty();
                                ayahQuerySelector.append('<option value=""></option>');
                                 $.each(result.data, function (key, value) {
-                                   ayahQuerySelector.prop("disabled", false); // are now enabled.
-                                   ayahQuerySelector.append('<option value="' + value.number + '">' + value.number + '</option>');
+                                    if(value.ayah_number!=0){
+                                        ayahQuerySelector.prop("disabled", false); // are now enabled.
+                                        ayahQuerySelector.append('<option value="' + value.surah_id+"."+value.ayah_number + '">' + value.ayah_number + '</option>');
+                                    }
+
                                     
                                     
                                 });
@@ -473,10 +476,12 @@
                                 $('[data-kt-repeater="select2"]:eq(2)').empty();
                                 $('[data-kt-repeater="select2"]:eq(2)').append('<option value=""></option>');
                                 $.each(result.data, function (key, value) {
+                                    if(value.ayah_number!=0){
+
                                     $('[data-kt-repeater="select2"]:eq(2)').prop("disabled", false); // are now enabled.
-                                    $('[data-kt-repeater="select2"]:eq(2)').append('<option value="' + value.number + '">' + value.number + '</option>');
+                                    $('[data-kt-repeater="select2"]:eq(2)').append('<option value="' + value.surah_id+"."+value.ayah_number + '">' + value.ayah_number + '</option>');
                                     
-                                    
+                                    }
                                 });
                                 
                                 
