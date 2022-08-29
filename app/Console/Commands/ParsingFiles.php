@@ -245,7 +245,7 @@ class ParsingFiles extends Command
     }
     protected function getText(){
         $doc = new \DOMDocument;
-        $files = glob("surah0-114/*/*.xml");
+        $files = glob("surah0-114-aug22/*/*.xml");
         $sections = array();
         $csv=array();
         $listTopicsDB =array();
@@ -260,8 +260,8 @@ class ParsingFiles extends Command
                 $query = "//tei:div[@type='section']";
                 
                 $elements = $xpath->query($query);
-                $lstvolPage='1:136';
-
+                $lstvolPage='1:3';
+                $lstayah='';
                 foreach ($elements as $element) {
                 
                     $chapters = array();
@@ -271,11 +271,11 @@ class ParsingFiles extends Command
                     $ayahs = $xpath->query("./tei:head/tei:quote", $element);
                     
                     $topics = $xpath->evaluate("./tei:p | ./tei:div[@type='subsection']/tei:p", $element);
-                    
-                
+                    $number ="0.11";
+                    $title ="فَاتِحَةِالْكِتَابِ";
                     foreach ($ayahs as  $id=> $value) {
 
-                      $number = $value->getattribute("n");
+                        $number = $value->getattribute("n");
                         $title = $value->nodeValue;
                         
                         $chapters = array("chapterNumber"=>explode(".", $number)[0],"ayahNumber" => $number, "title" => trim($title));
@@ -293,7 +293,7 @@ class ParsingFiles extends Command
                         $pers=[];
                         $volPage='';
 
-                        $subtopics = $xpath->query("./tei:seg", $topic);
+                        $subtopics = $xpath->evaluate("./tei:seg | ./tei:time", $topic);
                         foreach ($subtopics as $key => $value) {
                             $analist = $value->getattribute("ana");
                             $subtopicList.=' '.trim($value->getattribute("ana"));
@@ -320,6 +320,12 @@ class ParsingFiles extends Command
                         }
        
                         $number=str_replace(':','.',$number);
+                        if(!empty($number)){
+                          $lstayah=$number;
+                        }else{
+                          $number=$lstayah;
+
+                        }
                         $topicList[] = array("chapter"=>explode(".", $number)[0],"ayah" => $number, "ayahTitle" => trim($title),"content"=>trim($topic->nodeValue),"xml_content"=>$htmlString,"type"=> $type,'topic' => $list,'subtopic' => $subtopicList,'narrator'=> $pers,'vol'=>$volPage,'timestamp' => strtotime("-1d"));
                        
                         $json = preg_replace('/(\s+)?\\\t(\s+)?/', ' ', json_encode(array("chapter"=>explode(".", $number)[0],"ayah" => $number, "ayahTitle" => trim($title),"content"=>trim($topic->nodeValue),"xml_content"=>$htmlString,"type"=> $type,'topic' => $list,'subtopic' => $subtopicList,'narrator'=> $pers,'vol'=>$volPage,'timestamp' => strtotime("-1d")), JSON_UNESCAPED_UNICODE));

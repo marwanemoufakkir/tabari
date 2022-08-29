@@ -133,7 +133,7 @@
 											
 											<select name="filter[topic][]" class="form-select form-select-solid" data-control="select2" data-close-on-select="false" data-placeholder="موضوع Topic" data-allow-clear="true" multiple="multiple">
 												<option></option>
-												@foreach (\App\Models\Topic::groupBy('name')->get()->toArray() as $topic)
+												@foreach (\App\Models\Topic::orderBy('id')->get()->toArray() as $topic)
 												<option value="{{$topic['tag']}}">{{$topic['name']}}</option>
 												@endforeach
 											</select>
@@ -145,11 +145,10 @@
 											<label class="fs-6 form-label fw-bolder text-dark">موضوع فرعي Subtopic</label>
 											<select name="filter[subtopic][]" class="form-select form-select-solid" data-control="select2" data-close-on-select="false" data-placeholder="موضوع فرعي Subtopic" data-allow-clear="true" multiple="multiple">
 												<option></option>
-												@foreach (\App\Models\Subtopic::groupBy('name')->get()->toArray() as $subtopic )
+												@foreach (\App\Models\Subtopic::orderBy('id')->get()->toArray() as $subtopic )
 												<option value="{{$subtopic['tag']}}">{{$subtopic['name']}}</option>
 												@endforeach
 											</select>
-
 											
 										</div>
 										<!--end::Input group-->
@@ -158,8 +157,14 @@
 											<label class="fs-6 form-label fw-bolder text-dark mb-5">نوع Type</label>
 											<!--begin::Checkbox-->
 											<div class="form-check form-check-custom form-check-solid mb-5">
-												<input class="form-check-input" type="checkbox" value="hadith" name="filter[type][]" />
-												<label class="form-check-label flex-grow-1 fw-bold text-gray-700 fs-6" for="type">Hadith</label>
+												<input class="form-check-input" type="checkbox" value="hadith-sanad" name="filter[type][]" />
+												<label class="form-check-label flex-grow-1 fw-bold text-gray-700 fs-6" for="type">Hadith-sanad</label>
+											</div>
+											<!--end::Checkbox-->
+											<!--begin::Checkbox-->
+											<div class="form-check form-check-custom form-check-solid mb-5">
+												<input class="form-check-input" type="checkbox" value="hadith-matn" name="filter[type][]" />
+												<label class="form-check-label flex-grow-1 fw-bold text-gray-700 fs-6" for="type">Hadith-matn</label>
 											</div>
 											<!--end::Checkbox-->
 											<!--begin::Checkbox-->
@@ -199,6 +204,7 @@
 									@if(isset($query) and !empty($query))
 									<span class="text-dark fw-bolder fs-1">تم العثور على ({{$count['value']}}) نتيجة للكلمة الرئيسية <span class="text-primary fw-bolder fs-1">"{{$query}}"</span>	</span>
 									<!--begin::Description-->
+
 									@else
 									<span class="text-dark fw-bolder fs-1">النتائج</span>
 									<!--begin::Description-->
@@ -278,7 +284,6 @@
 												<?php
 												echo str_replace('/', '', preg_replace('/[0-9]+/', '', $item['_source']['content'])); 
 
-												// echo $item['_source']['content']; 
 												?>
 											
 										@endif
@@ -337,8 +342,68 @@
 					<!--end::Content-->
 
 				</div>
+				@if(Request::get('filter'))
 				<!--end::Wrapper-->
+				<div class="sidebar p-5 px-lg-0 py-lg-11" data-kt-drawer="true" data-kt-drawer-name="sidebar" data-kt-drawer-activate="{default: true, lg: false}" data-kt-drawer-overlay="true" data-kt-drawer-width="275px" data-kt-drawer-direction="end" data-kt-drawer-toggle="#kt_sidebar_toggle">
 
+
+					<!--begin::Popular Questions-->
+					<div class="card bg-light mb-5 mb-lg-10 shadow-none border-0">
+						<!--begin::Header-->
+						<div class="card-header align-items-center border-0">
+							<!--begin::Title-->
+							<h3 class="card-title fw-bold text-gray-900 fs-3">Filters</h3>
+							<!--end::Title-->
+						</div>
+						<!--end::Header-->
+						<!--begin::Body-->
+						<div class="card-body pt-0">
+							@foreach ( Request::get('filter') as $index => $param)
+							@foreach ($param as $key => $field)
+							
+								<!--begin::Item-->
+								<div class="d-flex mb-5">
+									<!--begin::Arrow-->
+									<!--begin::Svg Icon | path: icons/duotune/general/gen057.svg-->
+									<span class="svg-icon svg-icon-2 mt-0 me-2">
+										<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+											<rect opacity="0.3" x="2" y="2" width="20" height="20" rx="5" fill="currentColor"></rect>
+											<path d="M11.9343 12.5657L9.53696 14.963C9.22669 15.2733 9.18488 15.7619 9.43792 16.1204C9.7616 16.5789 10.4211 16.6334 10.8156 16.2342L14.3054 12.7029C14.6903 12.3134 14.6903 11.6866 14.3054 11.2971L10.8156 7.76582C10.4211 7.3666 9.7616 7.42107 9.43792 7.87962C9.18488 8.23809 9.22669 8.72669 9.53696 9.03696L11.9343 11.4343C12.2467 11.7467 12.2467 12.2533 11.9343 12.5657Z" fill="currentColor"></path>
+										</svg>
+									</span>
+									<!--end::Svg Icon-->
+									<!--end::Arrow-->
+									<!--begin::Title-->
+									@if($index==='surah')
+										@php $chapter=\App\Models\Surah::where('id',$field)->first(); @endphp 
+										<span class="text-gray-700 fs-6 fw-bolder">{!! str_replace('سورة', ' ', $chapter['title']) !!} - {{ $chapter['transliteration'] }} </span>
+									@endif
+									@if($index==='topic')
+										@php $topic=\App\Models\Topic::where('tag',$field)->first(); @endphp 
+										<span class="text-gray-700 fs-6 fw-bolder">{{$topic['name']}} </span>
+									@endif
+									@if($index==='subtopic')
+									@php $subtopic=\App\Models\Subtopic::where('tag',$field)->first(); @endphp 
+									<span class="text-gray-700 fs-6 fw-bolder">{{$subtopic['name']}} </span>
+									@endif
+									@if($index==='type')
+									<span class="text-gray-700 fs-6 fw-bolder">{{$field}} </span>
+									@endif
+									<!--end::Title-->
+								</div>
+								<!--end::Item-->
+							{{-- <input name="kt_docs_repeater_advanced[{{$index}}][{{$key}}]" type="text" value="{{$field}}" hidden>  --}}
+							@endforeach
+							@endforeach	
+
+
+						</div>
+						<!--end: Card Body-->
+					</div>
+					<!--end::Popular Questions-->
+
+				</div>
+				@endif
 			</div>
 			<!--end::Container-->
 
@@ -352,15 +417,18 @@
 				<!--end::Copyright-->
 				<!--begin::Menu-->
 				<ul class="menu fw-semibold order-1">
+					
+
+					<li class="menu-item">
+						<a href="/about"  class="text-white  ps-2 pe-0">About</a>
+					</li>
 					<li class="menu-item">
 						<a href="/topics?surah=&amp;chart=packedbubble"  class="text-white  px-2">Graph</a>
 					</li>
 					<li class="menu-item">
 						<a href="/"  class="text-white  px-2">Search</a>
 					</li>
-					<li class="menu-item">
-						<a href="/about"  class="text-white  ps-2 pe-0">About</a>
-					</li>
+
 				</ul>
 				<!--end::Menu-->
 			</div>

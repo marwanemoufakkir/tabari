@@ -375,14 +375,14 @@ $(document).ready(function () {
 				},
 				labels: {
 					items: [{
-						html: 'Hadith',
+						html: 'Nothadith',
 						style: {
 							left: '200px',
 							top: '300px',
 							color: (Highcharts.theme && Highcharts.theme.textColor) || 'black'
 						}
 					}, {
-						html: 'Nothadith',
+						html: 'Hadith ',
 						style: {
 							left: '700px',
 							top: '300px',
@@ -393,9 +393,9 @@ $(document).ready(function () {
 					},
 					series: [{
 					type: 'pie',
-					name: 'Hadith',
+					name: 'Nothadith',
 					colorByPoint: true,
-					data: hadithDataPie,
+					data: nothadithDataPie,
 					center: [700, 80],
 					size: '80%',
 					showInLegend: false,
@@ -404,9 +404,9 @@ $(document).ready(function () {
 					}
 				},{
 					type: 'pie',
-					name: 'Nothadith',
+					name: 'Hadith',
 					colorByPoint: true,
-					data: nothadithDataPie,
+					data: hadithDataPie,
 					center: [200, 80],
 					size: '80%',
 					showInLegend: false,
@@ -446,14 +446,14 @@ $(document).ready(function () {
                 plotOptions: {
                     packedbubble: {
                     minSize: '20%',
-                    maxSize: '100%',
+                    maxSize: '80%',
                     zMin: 0,
                     zMax: 1000,
                     layoutAlgorithm: {
                         gravitationalConstant: 0.05,
                         splitSeries: true,
-                        seriesInteraction: false,
-                        dragBetweenSeries: false,
+                        seriesInteraction: true,
+                        dragBetweenSeries: true,
                         parentNodeLimit: true
                     },
                     dataLabels: {
@@ -468,12 +468,12 @@ $(document).ready(function () {
                     }
                 },
                 series: [{
-                    name: 'Nothadith',
+                    name: 'Hadith',
                     color: 'rgba(119, 152, 191, .5)',
                     data: hadithData
                     
                 }, {
-                    name: 'Hadith',
+                    name: 'Nothadith' ,
                     color: 'rgba(223, 83, 83, .5)',
                     data: nothadithData
                 }]

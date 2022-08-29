@@ -15,14 +15,23 @@
     <link href="assets/css/style.bundle.rtl.css" rel="stylesheet" type="text/css" />
     <!--end::Global Stylesheets Bundle-->
     <style>
-
+/* .select2-dropdown {
+    background-color: white;
+    border: 1px solid #aaa;
+    border-radius: 4px;
+    box-sizing: border-box;
+    display: block;
+    position: initial;
+    right: -100000px;
+    width: 100%;
+    z-index: 1051;
+} */
         .select2-container--bootstrap5 .select2-selection--single .select2-selection__rendered {
             display: block;
             padding-left: 0;
             padding-right: 0;
             overflow: hidden;
             text-overflow: ellipsis;
-            /* font-weight: 900; */
             white-space: nowrap;
             color: black;
         }
@@ -223,7 +232,7 @@
                                                                                 <option value=""></option>
                                                                                 
                                                                                 @foreach (\App\Models\Surah::get() as $surah)
-                                                                                <option value="{{ $surah->id }}">{!! str_replace('سورة', ' ', $surah->title) !!} - {{ $surah->transliteration }}</option>
+                                                                                <option value="{{ $surah->id }}">{{$surah->title}} - {{ $surah->transliteration }}</option>
                                                                                 @endforeach
                                                                             </select>
                                                                         </div>
@@ -240,25 +249,24 @@
                                                                                 @php
                                                                                     \DB::statement("SET SQL_MODE=''");
                                                                                 @endphp
-                                                                                @foreach (\App\Models\Topic::groupBy('name')->get()->toArray() as $topic)
+                                                                                @foreach (\App\Models\Topic::orderBy('id')->get()->toArray() as $topic)
                                                                                 <option value="{{ $topic['tag']}}">{{ $topic['name']}}</option>
                                                                                 @endforeach
                                                                             </select>
                                                                         </div>
                                                                         <div class="col-md-3">
                                                                             <label class="fs-2 form-label fw-bolder text-dark">موضوع فرعي Subtopic :</label>
-                                                                            <select name="subtopic" class="form-select form-select-solid" data-kt-repeater="select2" data-placeholder="موضوع فرعي Subtopic" >
+                                                                            <select name="subtopic" class="form-select form-select-solid" data-kt-repeater="select2" data-placeholder="موضوع فرعي Subtopic" disabled>
                                                                                 <option value=""></option>
-                                                                                @foreach (\App\Models\Subtopic::groupBy('name')->get()->toArray() as $subtopic)
-                                                                                <option value="{{ $subtopic['tag']}}">{{ $subtopic['name']}}</option>
-                                                                                @endforeach
+                                                                
                                                                             </select>
                                                                         </div>
                                                                         <div class="col-md-2">
                                                                             <label class="fs-2 form-label fw-bolder text-dark">نوع Type :</label>
                                                                             <select name="type" class="form-select form-select-solid" data-kt-repeater="select2" data-placeholder="نوع Type" >
                                                                                 <option value=""></option>
-                                                                                <option value="hadith">hadith</option>
+                                                                                <option value="hadith-sanad">hadith-sanad</option>
+                                                                                <option value="hadith-matn">hadith-matn</option>
                                                                                 <option value="nothadith">nothadith</option>
                                                                             </select>
                                                                         </div>
@@ -415,7 +423,7 @@
                                         
 
                     var ayahQuerySelector=$(this).find('[data-kt-repeater="select2"]:eq(2)');
-
+                    var subTopicQuerySelector=$(this).find('[data-kt-repeater="select2"]:eq(4)');
                     $(this).find('[data-kt-repeater="select2"]').select2();
                     $(this).find('[data-kt-repeater="select2"]').val("default").trigger("change");
                     $(this).find('[data-kt-repeater="select2"]:eq(1)').on('select2:select', function (e) {
@@ -440,6 +448,36 @@
                                         ayahQuerySelector.append('<option value="' + value.surah_id+"."+value.number + '">' + value.number + '</option>');
                                     }
 
+                                    
+                                    
+                                });
+                                
+                                
+                            }
+                        });
+                    });
+
+                    $(this).find('[data-kt-repeater="select2"]:eq(3)').on('select2:select', function (e) {
+                        var data = e.params.data;
+                        var topic =data.id;
+                        $.ajax({
+                            url: "{{url('api/fetch-subtopics')}}",
+                            type: "POST",
+                            data: {
+                                topic: topic,
+                                _token: '{{csrf_token()}}'
+                            },
+                            dataType: 'json',
+                            success: function (result) {
+                                subTopicQuerySelector.empty();
+                                subTopicQuerySelector.append('<option value=""></option>');
+                                $.each(result.data[0].subtopics, function (key, value) {
+                                    
+                                    if(value.name!=''){
+                                       subTopicQuerySelector.prop("disabled", false); // are now enabled.
+                                       subTopicQuerySelector.append('<option value="' + value.tag+'">' + value.name + '</option>');
+                                    }
+                                 
                                     
                                     
                                 });
@@ -482,6 +520,36 @@
                                     $('[data-kt-repeater="select2"]:eq(2)').append('<option value="' + value.surah_id+"."+value.number + '">' + value.number + '</option>');
                                     
                                     }
+                                });
+                                
+                                
+                            }
+                        });
+                    });
+
+                    $('[data-kt-repeater="select2"]:eq(3)').on('select2:select', function (e) {
+                        var data = e.params.data;
+                        var topic =data.id;
+                        $.ajax({
+                            url: "{{url('api/fetch-subtopics')}}",
+                            type: "POST",
+                            data: {
+                                topic: topic,
+                                _token: '{{csrf_token()}}'
+                            },
+                            dataType: 'json',
+                            success: function (result) {
+                                $('[data-kt-repeater="select2"]:eq(4)').empty();
+                                $('[data-kt-repeater="select2"]:eq(4)').append('<option value=""></option>');
+                                $.each(result.data[0].subtopics, function (key, value) {
+                                    
+                                    if(value.name!=''){
+                                        $('[data-kt-repeater="select2"]:eq(4)').prop("disabled", false); // are now enabled.
+                                        $('[data-kt-repeater="select2"]:eq(4)').append('<option value="' + value.tag+'">' + value.name + '</option>');
+                                    }
+                                 
+                                    
+                                    
                                 });
                                 
                                 

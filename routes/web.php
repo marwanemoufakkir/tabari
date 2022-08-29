@@ -16,7 +16,7 @@ use App\Http\Controllers\DashboardController;
 |
 */
 Route::get('/clear-cache', function() {
-    Artisan::call('view:cache');
+    Artisan::call('import');
     return "Cache is cleared";
 });
 Route::get('/topics', function () {
@@ -35,6 +35,7 @@ Route::get('/', function () {
 Route::prefix('api')->group(function ()
 {
    Route::post('fetch-ayah', [ClientController::class, 'fetchSurahAyah']);
+   Route::post('fetch-subtopics', [ClientController::class, 'fetchSubTopics']);
 
 });
 Route::get('/ayah/{id}', [ClientController::class, 'fetchAyah']);

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Ayah;
+use App\Models\Topic;
 use Elasticsearch\ClientBuilder;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -56,7 +57,12 @@ class ClientController extends Controller
         $ayah = Ayah::get()->where('surah_id', $request->surah_id);
         return response()->json(['data' => $ayah], 201);
     }
-
+    public function fetchSubTopics(Request $request)
+    {
+        $subtopics = Topic::where('tag', $request->topic)->with('subtopics')->get();
+       
+        return response()->json(['data' =>$subtopics], 201);
+    }
     private function findAyahXML(string $query = ''): array
     {
         $params = [
@@ -73,6 +79,7 @@ class ClientController extends Controller
     {
 
         $requestParams = $request->kt_docs_repeater_advanced;
+        // dd($requestParams);
         $search = new Search();
         $boolQuery = new BoolQuery();
 
@@ -98,7 +105,10 @@ class ClientController extends Controller
                     break;
             }
 
-            // dd($param);
+            if(array_key_exists('subtopic', $param) && $param['subtopic']!=''){
+                unset($param["topic"]);
+            }
+  
             foreach ($param as $key => $field) {
                 if ($key === 'content') {
                     switch ($searchType) {
@@ -125,6 +135,7 @@ class ClientController extends Controller
                 }
 
                 if ($key === 'ayah' || $key === 'chapter' || $key === 'topic' || $key === 'subtopic' || $key === 'type') {
+                    
                     $boolQuery->add(new TermQuery($key, $field), $BoolQueryOperator);
 
                 }

@@ -1,6 +1,8 @@
 <?php
 
 namespace App\Http\Controllers;
+
+use App\Models\Subtopic;
 use App\Models\Topic;
 use Elasticsearch\ClientBuilder;
 use Illuminate\Http\Request;
@@ -81,7 +83,7 @@ class DashboardController extends Controller
     function subtopicsBubble(Request $request){
 
         $aggregation=array();
-        $topics=Topic::get('tag');
+        $topics=Subtopic::get('tag');
         
         $boolQuery=new BoolQuery();
         foreach ($topics->toArray() as $key => $value) {
