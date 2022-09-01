@@ -92,7 +92,7 @@
                                     </div>
 
                                     <div class="menu-item me-lg-1">
-                                        <a class="menu-link  py-3" href="#">
+                                        <a class="menu-link  py-3" href="/about">
                                             <span class="text-dark fw-bolder">About</span>
                                         </a>
                                     </div>

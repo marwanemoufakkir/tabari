@@ -23,6 +23,10 @@ Route::get('/topics', function () {
   
     return view('topics');
 });
+Route::get('/about', function () {
+  
+    return view('about');
+});
 Route::get('/subtopics', function () {
   
     return view('subtopics');
@@ -42,6 +46,7 @@ Route::get('/ayah/{id}', [ClientController::class, 'fetchAyah']);
 
 Route::get('/result', [ClientController::class, 'elasticsearchQueries']);
 
+Route::get('/parsing', [ClientController::class, 'parsingDocument']);
 Route::prefix('dashboard')->group(function ()
 {
    Route::get('topicsBubble', [DashboardController::class, 'topicsBubble']);

@@ -14,6 +14,9 @@ use ONGR\ElasticsearchDSL\Query\FullText\MatchPhraseQuery;
 use ONGR\ElasticsearchDSL\Query\FullText\MatchQuery;
 use ONGR\ElasticsearchDSL\Query\TermLevel\TermQuery;
 use ONGR\ElasticsearchDSL\Search;
+use ONGR\ElasticsearchDSL\Sort\FieldSort;
+
+
 
 class ClientController extends Controller
 {
@@ -195,13 +198,16 @@ class ClientController extends Controller
         $higlight->setFragmentSize(0);
         $higlight->setNumberOfFragments(2);
         $search->addHighlight($higlight);
+        $sortField1 = new FieldSort('timestamp', FieldSort::ASC);
+        $search->addSort($sortField1);
         $searchParams = [
             'index' => 'my-tafsir2',
             'from' => $from,
             'size' => $per_page,
             'body' => $search->toArray(),
         ];
-        $searchParams['sort'] = array('timestamp:asc');
+        // $searchParams['sort'] = array('timestamp:asc');
+        // dd(json_encode($searchParams));
         $items = $this->elasticsearch->search($searchParams);
 
         return $items;
@@ -226,6 +232,108 @@ class ClientController extends Controller
     {
         $count = $items['hits']['total'];
         return $count;
+    }
+
+    public function parsingDocument(){
+        $doc = new \DOMDocument;
+        $files = glob(public_path()."/surah0-114-aug22/*/*.xml",GLOB_BRACE);
+        sort($files, SORT_NATURAL);
+
+
+        if (is_array($files)) {   
+            foreach($files as $filename) {
+                $doc->load($filename);
+                libxml_use_internal_errors(true);
+                $xpath = new \DOMXPath($doc);
+                libxml_clear_errors();
+
+                $xpath->registerNamespace("tei", "http://www.tei-c.org/ns/1.0");
+                $query = "//tei:div[@type='section']";
+                $elements = $xpath->query($query);
+                $lstvolPage='1:3';
+                $lstayah='';
+                foreach ($elements as $element) {
+                    $ayahs = $xpath->evaluate("./tei:head/tei:quote", $element);
+                    $topics = $xpath->evaluate("./tei:p | ./tei:div[@type='subsection']/tei:p", $element);
+                    if($ayahs->length){
+                        
+                        foreach ($ayahs as  $id=> $value) {
+                            $number = $value->getattribute("n");
+                            $title = trim($value->nodeValue);
+                        }
+
+                    }else{
+                        if(explode('_section',explode('sure_',$filename)[1])[0]==='0'){
+                            $number ="0.0";
+                            $title ="فَاتِحَةِالْكِتَابِ";
+                        }else{
+                            $number ="";
+                            $title =""; 
+                        }
+                       
+                    }
+                    if($topics->length){
+                        foreach ($topics  as $key => $topic) {
+                            $pers=[];
+                            $volPage='';
+                            $type = $topic->getattribute("n");
+                            $list = trim(preg_replace("/[^A-Za-z0-9.!? ]/","",str_replace( 'yes', '', $topic->getattribute("ana"))));
+                            $htmlString = htmlentities($doc->saveXML($topic));
+                            $content =trim($topic->nodeValue);
+                            $subtopicList=array();
+                            $subtopics = $xpath->query("./tei:seg | ./tei:time", $topic);
+                            foreach ($subtopics as $key => $value) {
+                                
+                                $subtopicList[]=trim(preg_replace("/[^A-Za-z0-9.!? ]/","",str_replace( 'yes', '', $value->getattribute("ana"))));
+                            }
+                            $pb = $xpath->evaluate("./tei:pb[@type='turki'] | ./tei:said/tei:pb[@type='turki'] | ./tei:seg/tei:pb[@type='turki'] | ./tei:quote/tei:seg/tei:pb[@type='turki']", $topic);
+                            foreach ($pb as $key => $vol) {
+                                $volPage=$vol->getattribute("n");
+                            }
+                            if(!empty($volPage)){
+                                $lstvolPage=$volPage;
+                                }else{
+                                $volPage=$lstvolPage;
+                            }
+
+                            $persName = $xpath->query("./tei:persName", $topic);
+                            foreach ($persName as $key => $per) {
+                                $persNameType = $per->getattribute("ana");
+                                $narr=$per->nodeValue;
+                                $pers[]=array('type'=>$persNameType,'name'=>$narr);
+                            }
+                            if(!empty($number)){
+                                $lstayah=$number;
+                                }else{
+                                $number=$lstayah;
+                                
+                            }
+                            // dd(array_unique($subtopicList));
+                            $array = array_unique($subtopicList, SORT_REGULAR);
+                            if(!empty($content )){
+                                echo "*********************************</br>";
+                                 $json = preg_replace('/(\s+)?\\\t(\s+)?/', ' ', json_encode(array("chapter"=>explode('_section',explode('sure_',$filename)[1])[0],"ayah" => $number, "ayahTitle" => trim($title),"content"=>trim($topic->nodeValue),"xml_content"=>$htmlString,"type"=> $type,'topic' => $list,'subtopic' => implode(' ',$array),'narrator'=> $pers,'vol'=>$volPage,'timestamp' => strtotime("-1d")), JSON_UNESCAPED_UNICODE));
+                                 $json = preg_replace('/(\s+)?\\\n(\s+)?/', ' ',$json);
+                                 print_r(json_decode($json));
+                                 echo "*********************************</br>";
+
+                                //  $result=$this->elasticsearch->index([
+                                //     'index' => 'my-tafsir3',
+                                //     'type' => '_doc',
+                                //     'body'=>json_decode($json)
+                                //     ]);
+                                //     print_r($result);
+                                
+                            }
+
+
+                        }
+                    }
+                    
+                }
+                die();
+            }   
+        }
     }
 
 }
